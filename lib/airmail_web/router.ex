@@ -17,11 +17,6 @@ defmodule AirmailWeb.Router do
     plug :accepts, ["json"]
   end
 
-  scope "/", AirmailWeb do
-    pipe_through :browser
-
-    get "/", PageController, :home
-  end
 
   # Other scopes may use custom stacks.
   # scope "/api", AirmailWeb do
@@ -68,7 +63,25 @@ defmodule AirmailWeb.Router do
       on_mount: [{AirmailWeb.UserAuth, :ensure_authenticated}] do
       live "/users/settings", UserSettingsLive, :edit
       live "/users/settings/confirm_email/:token", UserSettingsLive, :confirm_email
+
+      # These all require that the user is on the team too
+      live "/teams/new", TeamLive.Index, :new
+      live "/teams/:id/edit", TeamLive.Index, :edit
+
+      live "/teams/:id/show/edit", TeamLive.Show, :edit
     end
+  end
+
+  scope "/", AirmailWeb do
+    pipe_through :browser
+
+    get "/", PageController, :home
+
+    live_session :anyone,
+      on_mount: [{AirmailWeb.UserAuth, :mount_current_user}] do
+        live "/teams", TeamLive.Index, :index
+        live "/teams/:id", TeamLive.Show, :show
+      end
   end
 
   scope "/", AirmailWeb do

@@ -37,6 +37,46 @@
     }Users
   ```
 
+## Git Workflow
+
+  ### Create Branch
+  
+  update local branch
+
+  ```
+  cd $working_dir/project_name
+  git fetch upstream
+  git checkout main
+  git rebase upstream/main
+  ```
+
+  branch out
+
+  ```
+  git checkout -b feature/my-precious
+  ```
+
+  ### Sync Branch
+
+  ```
+  # While on your feature/my-precious branch
+  git fetch upstream
+  git rebase upstream/main
+  ```
+
+  ### Commit
+
+  ```
+  git commit
+  ```
+
+  ### Push Changes
+
+  ```
+  git push $your_remote_name feature/my-precious
+  ```
+
+
 To start your Phoenix server:
 
   * Run `mix setup` to install and setup dependencies

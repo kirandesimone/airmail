@@ -19,9 +19,8 @@ defmodule AirmailWeb.TeamLive.FormComponent do
         phx-change="validate"
         phx-submit="save"
       >
+        <.input field={@form[:owner]} type="hidden" value={@current_user.id} />
         <.input field={@form[:name]} type="text" label="Name" />
-        <.input field={@form[:wins]} type="number" label="Wins" />
-        <.input field={@form[:losses]} type="number" label="Losses" />
         <:actions>
           <.button phx-disable-with="Saving...">Save Team</.button>
         </:actions>
@@ -70,7 +69,7 @@ defmodule AirmailWeb.TeamLive.FormComponent do
   end
 
   defp save_team(socket, :new, team_params) do
-    case Teams.create_team(team_params) do
+    case Teams.create_team(team_params, [socket.assigns.current_user]) do
       {:ok, team} ->
         notify_parent({:saved, team})
 

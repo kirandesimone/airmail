@@ -49,9 +49,9 @@ defmodule Airmail.Teams do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_team(attrs \\ %{}) do
+  def create_team(attrs \\ %{}, user \\ []) do
     %Team{}
-    |> Team.changeset(attrs)
+    |> Team.changeset(attrs, user)
     |> Repo.insert()
   end
 

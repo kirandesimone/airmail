@@ -17,7 +17,7 @@ defmodule AirmailWeb.TeamLive.Index do
   defp apply_action(socket, :new, _params) do
     socket
     |> assign(:page_title, "New Team")
-    |> assign(:team, %Team{})
+    |> assign(:team, %Team{users: []})
   end
 
   defp apply_action(socket, :edit, %{"id" => id}) do

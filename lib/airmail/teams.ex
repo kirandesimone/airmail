@@ -35,7 +35,11 @@ defmodule Airmail.Teams do
       ** (Ecto.NoResultsError)
 
   """
-  def get_team!(id), do: Repo.get!(Team, id)
+  def get_team!(id) do
+    Team
+    |> preload(:users)
+    |> Repo.get!(id)
+  end
 
   @doc """
   Creates a team.
@@ -67,9 +71,9 @@ defmodule Airmail.Teams do
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_team(%Team{} = team, attrs) do
+  def update_team(%Team{} = team, attrs, users \\ []) do
     team
-    |> Team.changeset(attrs)
+    |> Team.changeset(attrs, users)
     |> Repo.update()
   end
 

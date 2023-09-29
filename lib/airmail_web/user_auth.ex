@@ -172,6 +172,23 @@ defmodule AirmailWeb.UserAuth do
     end
   end
 
+  def on_mount(:user_owns_team, %{"id" => team_id}, _session, socket) do
+    team = Airmail.Teams.get_team!(team_id)
+
+    if socket.assigns.current_user.id == team.owner do
+      {:cont, socket}
+    else
+      socket =
+        socket
+        |> Phoenix.LiveView.put_flash(:error, "You must be the owner of the team to modify")
+        |> Phoenix.LiveView.redirect(to: ~p"/teams")
+
+      {:halt, socket}
+    end
+  end
+
+  def on_mount(:user_owns_team, _porams, _session, socket), do: {:cont, socket}
+
   defp mount_current_user(socket, session) do
     Phoenix.Component.assign_new(socket, :current_user, fn ->
       if user_token = session["user_token"] do

@@ -1,4 +1,5 @@
 defmodule AirmailWeb.TeamLive.Index do
+  alias Airmail.Accounts
   use AirmailWeb, :live_view
 
   alias Airmail.Teams
@@ -26,7 +27,6 @@ defmodule AirmailWeb.TeamLive.Index do
     |> assign(:team, Teams.get_team!(id))
   end
 
-
   defp apply_action(socket, :index, _params) do
     socket
     |> assign(:page_title, "Listing Teams")
@@ -41,8 +41,32 @@ defmodule AirmailWeb.TeamLive.Index do
   @impl true
   def handle_event("delete", %{"id" => id}, socket) do
     team = Teams.get_team!(id)
-    {:ok, _} = Teams.delete_team(team)
 
-    {:noreply, stream_delete(socket, :teams, team)}
+    if socket.assigns.current_user.id == team.owner do
+      {:ok, _} = Teams.delete_team(team)
+    else
+      {:noreply, stream_delete(socket, :teams, team)}
+    end
+  end
+
+  @impl true
+  def handle_event("join", %{"team_id" => team_id, "user_id" => user_id}, socket) do
+    user = Accounts.get_user!(user_id)
+    team = Teams.get_team!(team_id)
+    ids = Enum.map(team.users, fn u -> u.id end)
+
+    if user.id in ids do
+      {:noreply,
+       socket
+       |> put_flash(:error, "You're already on this team")
+       |> push_navigate(to: ~p"/teams")}
+    else
+      {:ok, _team} = Teams.update_team(team, %{}, [user | team.users])
+
+      {:noreply,
+       socket
+       |> put_flash(:info, "You're throwing with #{team.name}")
+       |> push_navigate(to: ~p"/teams")}
+    end
   end
 end

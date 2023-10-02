@@ -2,9 +2,11 @@
   Team <%= @team.id %>
   <:subtitle>This is a team record from your database.</:subtitle>
   <:actions>
+  <%= if assigns[:current_user] && @current_user.id == @team.owner do %>
     <.link navigate={~p"/teams/#{@team}/show/edit"} phx-click={JS.push_focus()}>
       <.button>Edit team</.button>
     </.link>
+  <% end %>
   </:actions>
 </.header>
 

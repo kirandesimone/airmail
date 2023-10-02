@@ -22,11 +22,13 @@
     <%= if assigns[:current_user] && @current_user.id == team.owner do %>
       <.link navigate={~p"/teams/#{team}/edit"}>Edit</.link>
     <% end %>
+    <%= if assigns[:current_user] do %>
     <.link phx-click={
       JS.push("join", value: %{team_id: team.id, user_id: @current_user.id}) |> hide("##{id}")
     }>
       Join
     </.link>
+    <% end %>
   </:action>
   <:action :let={{id, team}}>
     <%= if assigns[:current_user] && @current_user.id == team.owner do %>

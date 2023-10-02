@@ -3,13 +3,15 @@ defmodule AirmailWeb.TeamLiveTest do
 
   import Phoenix.LiveViewTest
   import Airmail.TeamsFixtures
+  import Airmail.AccountsFixtures
 
   @create_attrs %{losses: 42, name: "some name", wins: 42}
   @update_attrs %{losses: 43, name: "some updated name", wins: 43}
   @invalid_attrs %{losses: nil, name: nil, wins: nil}
 
   defp create_team(_) do
-    team = team_fixture()
+    user = user_fixture()
+    team = team_fixture(owner: user.id)
     %{team: team}
   end
 
@@ -24,7 +26,9 @@ defmodule AirmailWeb.TeamLiveTest do
     end
 
     test "saves new team", %{conn: conn} do
-      {:ok, index_live, _html} = live(conn, ~p"/teams")
+      user = user_fixture()
+
+      {:ok, index_live, _html} = conn |> log_in_user(user) |> live(~p"/teams")
 
       assert index_live |> element("a", "New Team") |> render_click() =~
                "New Team"
@@ -36,7 +40,7 @@ defmodule AirmailWeb.TeamLiveTest do
              |> render_change() =~ "can&#39;t be blank"
 
       assert index_live
-             |> form("#team-form", team: @create_attrs)
+             |> form("#team-form", team: %{@create_attrs | owner: user.id})
              |> render_submit()
 
       assert_patch(index_live, ~p"/teams")
@@ -88,7 +92,9 @@ defmodule AirmailWeb.TeamLiveTest do
     end
 
     test "updates team within modal", %{conn: conn, team: team} do
-      {:ok, show_live, _html} = live(conn, ~p"/teams/#{team}")
+      user = user_fixture()
+
+      {:ok, show_live, _html} = conn |> log_in_user(user) |> live(~p"/teams/#{team}")
 
       assert show_live |> element("a", "Edit") |> render_click() =~
                "Edit Team"

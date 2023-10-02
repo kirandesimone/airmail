@@ -18,7 +18,9 @@ defmodule Airmail.Teams do
 
   """
   def list_teams do
-    Repo.all(Team)
+    Team
+    |> preload(:users)
+    |> Repo.all()
   end
 
   @doc """

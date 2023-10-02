@@ -1,0 +1,55 @@
+<.header>
+  Listing Teams
+  <:actions>
+    <.link navigate={~p"/teams/new"}>
+      <.button>New Team</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.table
+  id="teams"
+  rows={@streams.teams}
+  row_click={fn {_id, team} -> JS.navigate(~p"/teams/#{team}") end}
+>
+  <:col :let={{_id, team}} label="Name"><%= team.name %></:col>
+  <:col :let={{_id, team}} label="Wins"><%= team.wins %></:col>
+  <:col :let={{_id, team}} label="Losses"><%= team.losses %></:col>
+  <:action :let={{id, team}}>
+    <div class="sr-only">
+      <.link navigate={~p"/teams/#{team}"}>Show</.link>
+    </div>
+    <%= if assigns[:current_user] && @current_user.id == team.owner do %>
+      <.link navigate={~p"/teams/#{team}/edit"}>Edit</.link>
+    <% end %>
+    <%= if assigns[:current_user] do %>
+    <.link phx-click={
+      JS.push("join", value: %{team_id: team.id, user_id: @current_user.id}) |> hide("##{id}")
+    }>
+      Join
+    </.link>
+    <% end %>
+  </:action>
+  <:action :let={{id, team}}>
+    <%= if assigns[:current_user] && @current_user.id == team.owner do %>
+      <.link
+        phx-click={JS.push("delete", value: %{id: team.id}) |> hide("##{id}")}
+        data-confirm="Are you sure?"
+      >
+        Delete
+      </.link>
+    <% end %>
+  </:action>
+</.table>
+
+<.modal :if={@live_action in [:new, :edit]} id="team-modal" show on_cancel={JS.patch(~p"/teams")}>
+  <.live_component
+    module={AirmailWeb.TeamLive.FormComponent}
+    id={@team.id || :new}
+    title={@page_title}
+    action={@live_action}
+    team={@team}
+    current_user={@current_user}
+    patch={~p"/teams"}
+  />
+</.modal>

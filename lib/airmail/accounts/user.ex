@@ -8,6 +8,8 @@ defmodule Airmail.Accounts.User do
     field :hashed_password, :string, redact: true
     field :confirmed_at, :naive_datetime
 
+    many_to_many :teams, Airmail.Teams.Team, join_through: "users_teams"
+
     timestamps()
   end
 

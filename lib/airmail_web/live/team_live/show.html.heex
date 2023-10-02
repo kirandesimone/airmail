@@ -1,0 +1,37 @@
+<.header>
+  Team <%= @team.id %>
+  <:subtitle>This is a team record from your database.</:subtitle>
+  <:actions>
+  <%= if assigns[:current_user] && @current_user.id == @team.owner do %>
+    <.link navigate={~p"/teams/#{@team}/show/edit"} phx-click={JS.push_focus()}>
+      <.button>Edit team</.button>
+    </.link>
+  <% end %>
+  </:actions>
+</.header>
+
+<.list>
+  <:item title="Owner"><%= @team.owner %></:item>
+  <:item title="Name"><%= @team.name %></:item>
+  <:item title="Wins"><%= @team.wins %></:item>
+  <:item title="Losses"><%= @team.losses %></:item>
+  <:item title="Members">
+    <%= for user <- @team.users do %>
+      <p><%= user.id %></p>
+    <% end %>
+  </:item>
+</.list>
+
+<.back navigate={~p"/teams"}>Back to teams</.back>
+
+<.modal :if={@live_action == :edit} id="team-modal" show on_cancel={JS.patch(~p"/teams/#{@team}")}>
+  <.live_component
+    module={AirmailWeb.TeamLive.FormComponent}
+    id={@team.id}
+    title={@page_title}
+    action={@live_action}
+    team={@team}
+    current_user={@current_user}
+    navigate={~p"/teams/#{@team}"}
+  />
+</.modal>
